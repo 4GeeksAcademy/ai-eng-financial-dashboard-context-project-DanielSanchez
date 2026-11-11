@@ -3,6 +3,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { KPIRow } from "@/components/dashboard/kpi-row";
 import { IncomeOutcomeChart } from "@/components/dashboard/income-outcome-chart";
 import { ProfitPercentChart } from "@/components/dashboard/profit-percent-chart";
+import { IncomeList } from "@/components/dashboard/income-list";
 import {
   type FinancialMovement,
   type KPIMetrics,
@@ -20,11 +21,22 @@ async function fetchFinancialData(): Promise<FinancialMovement[]> {
   return response.json();
 }
 
+async function fetchIncomeMovements(): Promise<FinancialMovement[]> {
+  const response = await fetch(`${API_BASE_URL}/api/metrics/incomes`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch income movements: ${response.status}`);
+  }
+  return response.json();
+}
+
 function App() {
   const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
   const [monthlyData, setMonthlyData] = useState<MonthlyDataPoint[]>([]);
+  const [incomeMovements, setIncomeMovements] = useState<FinancialMovement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [incomeLoading, setIncomeLoading] = useState(true);
+  const [incomeError, setIncomeError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFinancialData()
@@ -39,6 +51,15 @@ function App() {
       })
       .finally(() => {
         setLoading(false);
+      });
+
+    fetchIncomeMovements()
+      .then(setIncomeMovements)
+      .catch(() => {
+        setIncomeError("Income movements could not be loaded.");
+      })
+      .finally(() => {
+        setIncomeLoading(false);
       });
   }, []);
 
@@ -65,6 +86,12 @@ function App() {
             <IncomeOutcomeChart data={monthlyData} loading={loading} />
             <ProfitPercentChart data={monthlyData} loading={loading} />
           </section>
+
+          <IncomeList
+            incomes={incomeMovements}
+            loading={incomeLoading}
+            error={incomeError}
+          />
         </div>
       </div>
     </main>

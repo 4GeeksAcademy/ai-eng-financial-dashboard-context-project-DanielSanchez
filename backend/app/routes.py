@@ -259,6 +259,13 @@ def get_metrics(
     return ensure_chronological_order(filtered)
 
 
+@router.get("/api/metrics/incomes", response_model=list[FinancialMovement])
+def get_income_movements() -> list[FinancialMovement]:
+    movements = generate_mock_movements(seed=42)
+    incomes = [movement for movement in movements if movement.operation_type == "income"]
+    return ensure_chronological_order(incomes)
+
+
 @router.get("/api/metrics/facets", response_model=MetricsFacets)
 def get_metrics_facets() -> MetricsFacets:
     movements = generate_mock_movements(seed=42)
