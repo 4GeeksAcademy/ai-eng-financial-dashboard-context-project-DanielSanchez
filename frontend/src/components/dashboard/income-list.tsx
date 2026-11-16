@@ -5,7 +5,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 
 interface IncomeListProps {
@@ -27,7 +26,7 @@ export function IncomeList({ incomes, loading, error }: IncomeListProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Income movements</CardTitle>
+        <h2 className="text-base font-semibold leading-none">Income movements</h2>
         <CardDescription>Income by date and amount</CardDescription>
       </CardHeader>
       <CardContent>

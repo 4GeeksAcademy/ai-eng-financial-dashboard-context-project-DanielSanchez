@@ -1,0 +1,93 @@
+{
+  "MetricsSummaryItem": {
+    "description": "Estructura de un item en la respuesta de /api/metrics/summary",
+    "type": "object",
+    "properties": {
+      "period": {
+        "type": "string",
+        "title": "Period",
+        "example": "2026-11"
+      },
+      "income": {
+        "type": "number",
+        "title": "Income",
+        "example": 15000.50
+      },
+      "outcome": {
+        "type": "number",
+        "title": "Outcome",
+        "example": 8234.75
+      },
+      "net": {
+        "type": "number",
+        "title": "Net",
+        "example": 6765.75
+      }
+    },
+    "required": ["period", "income", "outcome", "net"]
+  },
+  "MetricsComparison": {
+    "description": "Estructura de respuesta de /api/metrics/comparison",
+    "type": "object",
+    "properties": {
+      "current_period": {
+        "type": "number",
+        "title": "Current Period",
+        "example": 15000.50
+      },
+      "previous_period": {
+        "type": "number",
+        "title": "Previous Period",
+        "example": 12000.00
+      },
+      "delta_abs": {
+        "type": "number",
+        "title": "Delta Abs",
+        "example": 3000.50,
+        "description": "Diferencia absoluta entre períodos"
+      },
+      "delta_pct": {
+        "anyOf": [
+          {
+            "type": "number",
+            "example": 25.00
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Delta Pct",
+        "description": "Diferencia porcentual (null si previous_period es 0)"
+      }
+    },
+    "required": ["current_period", "previous_period", "delta_abs", "delta_pct"]
+  },
+  "MetricsAlert": {
+    "description": "Estructura de un item en la respuesta de /api/metrics/alerts",
+    "type": "object",
+    "properties": {
+      "period": {
+        "type": "string",
+        "title": "Period",
+        "example": "2026-11"
+      },
+      "outcome_total": {
+        "type": "number",
+        "title": "Outcome Total",
+        "example": 9500.00
+      },
+      "baseline_average": {
+        "type": "number",
+        "title": "Baseline Average",
+        "example": 7200.00
+      },
+      "increase_ratio": {
+        "type": "number",
+        "title": "Increase Ratio",
+        "example": 1.32,
+        "description": "Ratio de aumento (outcome_total / baseline_average). > 1.0 indica gastos encima del baseline"
+      }
+    },
+    "required": ["period", "outcome_total", "baseline_average", "increase_ratio"]
+  }
+}

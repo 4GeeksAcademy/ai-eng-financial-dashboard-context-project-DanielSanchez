@@ -1,6 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
+import { formatPercent } from '@/lib/financial-utils'
 import {
   LineChart,
   Line,
@@ -51,11 +52,14 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
   if (loading) {
     return (
       <Card className="border-border/60">
-        <CardHeader className="pb-4">
+        <p role="status" className="sr-only">
+          Loading profit margin chart.
+        </p>
+        <CardHeader aria-hidden="true" className="pb-4">
           <Skeleton className="h-5 w-52" />
           <Skeleton className="h-3 w-64 mt-1" />
         </CardHeader>
-        <CardContent>
+        <CardContent aria-hidden="true">
           <Skeleton className="h-[280px] w-full rounded-lg" />
         </CardContent>
       </Card>
@@ -67,7 +71,7 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
   return (
     <Card className="border-border/60">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Profit Margin %</CardTitle>
+        <h2 className="text-base font-semibold leading-none">Profit Margin %</h2>
         <CardDescription>Monthly profit as a percentage of total income</CardDescription>
       </CardHeader>
       <CardContent>
@@ -107,6 +111,30 @@ export function ProfitPercentChart({ data, loading }: ProfitPercentChartProps) {
             </LineChart>
           </ResponsiveContainer>
         )}
+        <details className="mt-4">
+          <summary className="cursor-pointer text-sm font-medium underline decoration-dotted underline-offset-4">
+            View monthly data
+          </summary>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <caption className="sr-only">Monthly profit margin percentages</caption>
+              <thead className="text-muted-foreground">
+                <tr>
+                  <th scope="col" className="px-3 py-2 font-medium">Month</th>
+                  <th scope="col" className="px-3 py-2 text-right font-medium">Profit margin</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {data.map((point) => (
+                  <tr key={point.month}>
+                    <th scope="row" className="px-3 py-2 font-normal">{point.month}</th>
+                    <td className="px-3 py-2 text-right tabular-nums">{formatPercent(point.profitPercent)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
       </CardContent>
     </Card>
   )

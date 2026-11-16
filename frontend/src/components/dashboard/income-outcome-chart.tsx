@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardDescription } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type MonthlyDataPoint } from '@/lib/financial-types'
 import { formatCurrency } from '@/lib/financial-utils'
@@ -50,11 +50,14 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
   if (loading) {
     return (
       <Card className="border-border/60">
-        <CardHeader className="pb-4">
+        <p role="status" className="sr-only">
+          Loading income and outcome chart.
+        </p>
+        <CardHeader aria-hidden="true" className="pb-4">
           <Skeleton className="h-5 w-52" />
           <Skeleton className="h-3 w-64 mt-1" />
         </CardHeader>
-        <CardContent>
+        <CardContent aria-hidden="true">
           <Skeleton className="h-[280px] w-full rounded-lg" />
         </CardContent>
       </Card>
@@ -66,7 +69,7 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
   return (
     <Card className="border-border/60">
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Income vs. Outcome</CardTitle>
+        <h2 className="text-base font-semibold leading-none">Income vs. Outcome</h2>
         <CardDescription>Monthly revenue and expenditure evolution</CardDescription>
       </CardHeader>
       <CardContent>
@@ -118,6 +121,32 @@ export function IncomeOutcomeChart({ data, loading }: IncomeOutcomeChartProps) {
             </LineChart>
           </ResponsiveContainer>
         )}
+        <details className="mt-4">
+          <summary className="cursor-pointer text-sm font-medium underline decoration-dotted underline-offset-4">
+            View monthly data
+          </summary>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <caption className="sr-only">Monthly income and outcome totals</caption>
+              <thead className="text-muted-foreground">
+                <tr>
+                  <th scope="col" className="px-3 py-2 font-medium">Month</th>
+                  <th scope="col" className="px-3 py-2 text-right font-medium">Income</th>
+                  <th scope="col" className="px-3 py-2 text-right font-medium">Outcome</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {data.map((point) => (
+                  <tr key={point.month}>
+                    <th scope="row" className="px-3 py-2 font-normal">{point.month}</th>
+                    <td className="px-3 py-2 text-right tabular-nums">{formatCurrency(point.income)}</td>
+                    <td className="px-3 py-2 text-right tabular-nums">{formatCurrency(point.outcome)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
       </CardContent>
     </Card>
   )
