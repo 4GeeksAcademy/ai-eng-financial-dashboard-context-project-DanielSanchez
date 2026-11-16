@@ -1,4 +1,4 @@
-# Verificacion del resumen del proyecto
+npx skills add addyosmani/web-quality-skills@accessibility --agent github-copilot# Verificacion del resumen del proyecto
 
 Verificacion contrastada con el codigo fuente y la documentacion del repositorio.
 
