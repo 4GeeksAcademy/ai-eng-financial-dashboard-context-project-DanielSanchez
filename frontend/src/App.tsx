@@ -13,20 +13,29 @@ import { computeKPIs, computeMonthlyData } from "@/lib/financial-utils";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
-async function fetchFinancialData(): Promise<FinancialMovement[]> {
-  const response = await fetch(`${API_BASE_URL}/api/metrics`);
+async function fetchFinancialData(signal: AbortSignal): Promise<FinancialMovement[]> {
+  const response = await fetch(`${API_BASE_URL}/api/metrics`, { signal });
   if (!response.ok) {
     throw new Error(`Failed to fetch financial data: ${response.status}`);
   }
   return response.json();
 }
 
-async function fetchIncomeMovements(): Promise<FinancialMovement[]> {
-  const response = await fetch(`${API_BASE_URL}/api/metrics/incomes`);
+async function fetchIncomeMovements(signal: AbortSignal): Promise<FinancialMovement[]> {
+  const response = await fetch(`${API_BASE_URL}/api/metrics/incomes`, { signal });
   if (!response.ok) {
     throw new Error(`Failed to fetch income movements: ${response.status}`);
   }
   return response.json();
+}
+
+function isAbortError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    error.name === "AbortError"
+  );
 }
 
 function App() {
@@ -39,28 +48,38 @@ function App() {
   const [incomeError, setIncomeError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchFinancialData()
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    fetchFinancialData(signal)
       .then((movements) => {
+        if (signal.aborted) return;
         setMetrics(computeKPIs(movements));
         setMonthlyData(computeMonthlyData(movements));
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        if (signal.aborted || isAbortError(error)) return;
         setError(
           "Unable to load financial data. Please check the backend API.",
         );
       })
       .finally(() => {
-        setLoading(false);
+        if (!signal.aborted) setLoading(false);
       });
 
-    fetchIncomeMovements()
-      .then(setIncomeMovements)
-      .catch(() => {
+    fetchIncomeMovements(signal)
+      .then((movements) => {
+        if (!signal.aborted) setIncomeMovements(movements);
+      })
+      .catch((error: unknown) => {
+        if (signal.aborted || isAbortError(error)) return;
         setIncomeError("Income movements could not be loaded.");
       })
       .finally(() => {
-        setIncomeLoading(false);
+        if (!signal.aborted) setIncomeLoading(false);
       });
+
+    return () => controller.abort();
   }, []);
 
   return (
